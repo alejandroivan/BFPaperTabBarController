@@ -39,7 +39,7 @@ extern CGFloat const bfPaperTabBarController_tapCircleDiameterFull;
 extern CGFloat const bfPaperTabBarController_tapCircleDiameterDefault;
 
 IB_DESIGNABLE
-@interface BFPaperTabBarController : UITabBarController <CAAnimationDelegate>
+@interface BFPaperTabBarController : UITabBarController
 
 #pragma mark - Properties
 #pragma mark Animation
@@ -47,6 +47,13 @@ IB_DESIGNABLE
 @property IBInspectable CGFloat touchDownAnimationDuration;
 /** A CGFLoat representing the duration of the animations which take place on touch UP! Default is 2 * touchDownAnimationDuration seconds. */
 @property IBInspectable CGFloat touchUpAnimationDuration;
+
+
+
+#pragma mark Views
+@property UIView *underlineLayer;
+@property UIView *topLineLayer;
+
 
 
 #pragma mark Prettyness and Behaviour
@@ -88,9 +95,6 @@ IB_DESIGNABLE
 
 /** A flag to set to YES to show the tap-circle and background fade. If NO, they will not appear. */
 @property IBInspectable BOOL showTapCircleAndBackgroundFade;
-
-/** A flag that enables or disables the touch gesture of the bar. Set this to NO when something covers the tab bar (like a full screen popup). */
-@property (nonatomic) BOOL userInteractionEnabled;
 
 
 #pragma mark - Utility Functions

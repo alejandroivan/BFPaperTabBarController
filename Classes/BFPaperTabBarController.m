@@ -36,8 +36,6 @@
 @property NSMutableArray *deathRowForCircleLayers;  // This is where old circle layers go to be killed :(
 @property CGPoint tapPoint;
 @property NSInteger selectedTabIndex;
-@property UIView *underlineLayer;
-@property UIView *topLineLayer;
 @property UIView *animationsView;
 @property UIView *invisibleTouchView;
 @property (nonatomic) NSMutableArray *tabRects;
@@ -137,15 +135,15 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
 }
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+ {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 
 #pragma mark - Super Overrides
@@ -193,12 +191,12 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     self.dumbBackgroundFadeColor        = [UIColor colorWithWhite:0.3 alpha:0.1f];
     self.dumbUnderlineColor             = [UIColor colorWithWhite:0.3 alpha:1];
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    
     // Set up the view which will hold all the animations:
     self.animationsView = [[UIView alloc] initWithFrame:self.tabBar.bounds];
     self.animationsView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.animationsView.backgroundColor = [UIColor clearColor];
-
+    
     // Set up the invisible layer to capture taps:
     self.invisibleTouchView = [[UIView alloc] initWithFrame:self.tabBar.frame];
     self.invisibleTouchView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -206,8 +204,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     self.invisibleTouchView.userInteractionEnabled = YES;
     self.invisibleTouchView.exclusiveTouch = NO;
     
-    UILongPressGestureRecognizer *press = [[UILongPressGestureRecognizer alloc] initWithTarget:self
-                                                                                        action:@selector(handleLongPress:)];
+    UILongPressGestureRecognizer *press = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     press.delegate = self;
     press.delaysTouchesBegan = NO;
     press.delaysTouchesEnded = NO;
@@ -216,22 +213,11 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     [self.invisibleTouchView addGestureRecognizer:press];
     press = nil;
     
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                                action:@selector(handleDoubleTap:)];
-    doubleTap.delegate = self;
-    doubleTap.delaysTouchesBegan = NO;
-    doubleTap.delaysTouchesEnded = NO;
-    doubleTap.cancelsTouchesInView = NO;
-    doubleTap.numberOfTapsRequired = 2;
-    doubleTap.numberOfTouchesRequired = 1;
-    [self.invisibleTouchView addGestureRecognizer:doubleTap];
-    doubleTap = nil;
-    
     self.rippleAnimationQueue = [NSMutableArray array];
     self.deathRowForCircleLayers = [NSMutableArray array];
     
     [UIView setAnimationDidStopSelector:@selector(animationDidStop:finished:)];
-
+    
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Defaults that rely on other views being instantiated before they can be set:                                         //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,13 +270,12 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
             self.underlineLayer = [UIView new];
             self.underlineLayer.frame = CGRectMake(self.tabBar.bounds.origin.x, y, self.tabBar.bounds.size.width, self.underlineThickness);
             //NSLog(@"underline frame: (%0.2f, %0.2f, %0.2f, %0.2f)", self.underlineLayer.frame.origin.x, self.underlineLayer.frame.origin.y, self.underlineLayer.frame.size.width, self.underlineLayer.frame.size.height);
-
+            
             [self.animationsView addSubview:self.underlineLayer];
             [self setUnderlineForTabIndex:self.selectedTabIndex animated:NO];
         }
     }
 }
-
 -(void)setShowTopLine:(BOOL)showTopLine{
     if (_showTopLine != showTopLine) {
         _showTopLine = showTopLine;
@@ -308,13 +293,8 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
             [self setToplineForTabIndex:self.selectedTabIndex animated:NO];
         }
     }
-
+    
 }
-
-- (void)setUserInteractionEnabled:(BOOL)userInteractionEnabled {
-    self.invisibleTouchView.userInteractionEnabled = userInteractionEnabled;
-}
-
 
 #pragma mark - KVO Handling
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -360,10 +340,10 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
         [self selectTabForPoint:location];
         
         self.tapPoint = location;
-//        self.tapPoint = CGPointMake(newLocation.x, location.y);
+        //        self.tapPoint = CGPointMake(newLocation.x, location.y);
         
         if (self.showTapCircleAndBackgroundFade) {
-//            self.growthFinished = NO;
+            //            self.growthFinished = NO;
             [self touchDownAnimations]; // Go Steelers!
         }
     }
@@ -381,17 +361,6 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     }
 }
 
-- (void)handleDoubleTap:(UITapGestureRecognizer *)doubleTap
-{
-    if (doubleTap.state == UIGestureRecognizerStateRecognized) {
-        //NSLog(@"Double tap REGOCNIZED");
-        if ([self.selectedViewController respondsToSelector:@selector(popToRootViewControllerAnimated:)]) {
-            //NSLog(@"popToRootViewControllerAnimated");
-            [(UINavigationController *)self.selectedViewController popToRootViewControllerAnimated:YES];
-        }
-    }
-}
-
 
 #pragma mark - Gesture Recognizer Delegate
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
@@ -405,14 +374,8 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
 {
     [self setSelectedIndex:index];
     self.selectedTabIndex = index;
+    [self setUnderlineForTabIndex:index animated:animated];
     [self setBackgroundFadeLayerForTabAtIndex:index];
-    
-    if (self.showTopLine)
-        [self setToplineForTabIndex:index animated:animated];
-    
-    if (self.showUnderline)
-        [self setUnderlineForTabIndex:index animated:animated];
-    
 }
 
 
@@ -420,7 +383,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
 - (void)setUnderlineForTabIndex:(NSInteger)index animated:(BOOL)animated
 {
     //NSLog(@"setting underline to index: %ld, animated ? %@", (long)index, animated ? @"YES" : @"NO");
-  
+    
     if (index < 0 || index >= [self.tabRects count]) {
         return;
     }
@@ -436,16 +399,16 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     CGFloat y = tabRect.size.height - self.underlineThickness;
     CGFloat w = tabRect.size.width;
     
-//    if (!animated) {
+    //    if (!animated) {
     CGFloat duration = animated ? self.touchDownAnimationDuration * 0.75f : 0;
     [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.underlineLayer.frame = CGRectMake(x, y, w, self.underlineThickness);
     } completion:^(BOOL finished) {
     }];
-//    }
-//    else {
-//        self.underlineLayer.frame = CGRectMake(x, y, w, self.underlineThickness);
-//    }
+    //    }
+    //    else {
+    //        self.underlineLayer.frame = CGRectMake(x, y, w, self.underlineThickness);
+    //    }
 }
 
 
@@ -471,7 +434,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
         self.topLineLayer.frame = CGRectMake(x, y, w, self.underlineThickness);
     } completion:^(BOOL finished) {
     }];
-
+    
 }
 
 
@@ -569,7 +532,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     //    CGRect frame = [[preSizeAdjustment objectAtIndex:i] CGRectValue];
     //    NSLog(@"frame for tab %d: (%0.2f, %0.2f, %0.2f, %0.2f", i, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
     //}
-
+    
     NSMutableArray *postSizeAdjusted = [NSMutableArray arrayWithCapacity:self.tabBar.items.count];
     for (int i = 0; i < preSizeAdjustment.count; i++) {
         NSValue *tabValue = [preSizeAdjustment objectAtIndex:i];
@@ -619,7 +582,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     //    CGRect frame = [[preSizeAdjustment objectAtIndex:i] CGRectValue];
     //    NSLog(@"frame for tab %d: (%0.2f, %0.2f, %0.2f, %0.2f", i, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
     //}
-
+    
     NSMutableArray *postSizeAdjusted = [NSMutableArray arrayWithCapacity:self.tabBar.items.count];
     for (int i = 0; i < preSizeAdjustment.count; i++) {
         NSValue *tabValue = [preSizeAdjustment objectAtIndex:i];
@@ -651,23 +614,23 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     //    CGRect frame = [[postSizeAdjusted objectAtIndex:i] CGRectValue];
     //    NSLog(@"frame for tab %d: (%0.2f, %0.2f, %0.2f, %0.2f", i, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
     //}
-
+    
     return postSizeAdjusted;
 }
 
 /*
-// No longer being used. But not sure if I want to delete it yet. LOL
-- (UIView *)viewForTabBarItemAtIndex:(NSInteger)index
-{
-    CGRect tabBarRect = self.tabBar.frame;
-    NSInteger buttonCount = self.tabBar.items.count;
-    CGFloat containingWidth = tabBarRect.size.width / buttonCount;
-    CGFloat originX = containingWidth * index ;
-    CGRect containingRect = CGRectMake( originX, 0, containingWidth, self.tabBar.frame.size.height );
-    CGPoint center = CGPointMake( CGRectGetMidX(containingRect), CGRectGetMidY(containingRect));
-    
-    return [self.tabBar hitTest:center withEvent:nil];
-}*/
+ // No longer being used. But not sure if I want to delete it yet. LOL
+ - (UIView *)viewForTabBarItemAtIndex:(NSInteger)index
+ {
+ CGRect tabBarRect = self.tabBar.frame;
+ NSInteger buttonCount = self.tabBar.items.count;
+ CGFloat containingWidth = tabBarRect.size.width / buttonCount;
+ CGFloat originX = containingWidth * index ;
+ CGRect containingRect = CGRectMake( originX, 0, containingWidth, self.tabBar.frame.size.height );
+ CGPoint center = CGPointMake( CGRectGetMidX(containingRect), CGRectGetMidY(containingRect));
+ 
+ return [self.tabBar hitTest:center withEvent:nil];
+ }*/
 
 - (CGRect)normalizedRectForRect:(CGRect)rect
 {
@@ -719,9 +682,9 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
         }
     }
     
-//    UIView *tempTabCover = [[UIView alloc] initWithFrame:frame];
-//    tempTabCover.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.4];
-//    [self.tabBar addSubview:tempTabCover];
+    //    UIView *tempTabCover = [[UIView alloc] initWithFrame:frame];
+    //    tempTabCover.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.4];
+    //    [self.tabBar addSubview:tempTabCover];
     return frame;
 }
 
@@ -798,7 +761,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
 #pragma mark - Animation
 - (void)animationDidStop:(CAAnimation *)theAnimation2 finished:(BOOL)flag
 {
-    //NSLog(@"animation ENDED");    
+    //NSLog(@"animation ENDED");
     if ([[theAnimation2 valueForKey:@"id"] isEqualToString:@"fadeCircleOut"]) {
         if (self.deathRowForCircleLayers.count > 0) {
             [[self.deathRowForCircleLayers objectAtIndex:0] removeFromSuperlayer];
@@ -851,7 +814,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     self.backgroundColorFadeLayer.opacity = 1;
     [self.backgroundColorFadeLayer addAnimation:fadeBackgroundDarker forKey:@"animateOpacity"];
     
-
+    
     
     UIView *tab = [self viewForTabInTabBar:self.tabBar withIndex:self.selectedTabIndex];
     
@@ -892,7 +855,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     // Add the animation layer to our animation queue and insert it into our view:
     [self.rippleAnimationQueue addObject:tapCircle];
     [self.animationsView.layer insertSublayer:tapCircle above:self.backgroundColorFadeLayer];
-
+    
     // Grow tap-circle animation:
     CABasicAnimation *tapCircleGrowthAnimation = [CABasicAnimation animationWithKeyPath:@"path"];
     tapCircleGrowthAnimation.duration = self.touchDownAnimationDuration;
@@ -949,7 +912,7 @@ CGFloat const bfPaperTabBarController_tapCircleDiameterDefault = -2.f;
     // Animation Mask Rects
     CGPoint center = CGPointMake(CGRectGetMidX(self.currentTabRect), CGRectGetMidY(self.currentTabRect));
     CGPoint origin = self.rippleFromTapLocation ? self.tapPoint : center;
-
+    
     UIBezierPath *endingCirclePath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(origin.x - (tapCircleFinalDiameter / 2.f),
                                                                                         origin.y - (tapCircleFinalDiameter / 2.f),
                                                                                         tapCircleFinalDiameter,
